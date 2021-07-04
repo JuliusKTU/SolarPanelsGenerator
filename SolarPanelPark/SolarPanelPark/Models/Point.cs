@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 
 namespace SolarPanelPark.Models
 {
-    public class SolarPanel
+    public class Point
     {
         public double X { get; set; }
         public double Y { get; set; }
-        public double Length { get; set; }
-        public double Width { get; set; }
+        public Point(double x, double y)
+        {
+            X = x;
+            Y = y;
+        }
     }
 }

@@ -13,6 +13,20 @@ namespace SolarPanelPark.ViewModels
     public class SolarParkViewModel : BaseViewModel
     {
         #region DEFINITIONS
+        private string _overview;
+        public string Overview
+        {
+            get
+            {
+                return _overview;
+            }
+            set
+            {
+                _overview = value;
+                OnPropertyChanged(nameof(Overview));
+            }
+        }
+
         private double _width;
         public double Width
         {
@@ -81,7 +95,7 @@ namespace SolarPanelPark.ViewModels
             {
                 _tiltAngle = value;
                 OnPropertyChanged(nameof(TiltAngle));
-                CalculateSolarPanels();
+                Overview = "Not implemented yet!";
             }
         }
 
@@ -93,66 +107,142 @@ namespace SolarPanelPark.ViewModels
 
         public SolarParkViewModel()
         {
+            Overview = "Generated 0 solar panels";
             SolarPanels = new ObservableCollection<SolarPanel>();
             BorderLines = new ObservableCollection<BorderLine>();
             RestrictionZones = new ObservableCollection<BorderLine>();
 
-
             //Coordinates of the site
-            BorderLines.Add(new BorderLine { StartX = 83, StartY = 136, EndX = 124, EndY = 186 });
-            BorderLines.Add(new BorderLine { StartX = 124, StartY = 186, EndX = 252, EndY = 155 });
-            BorderLines.Add(new BorderLine { StartX = 252, StartY = 155, EndX = 277, EndY = 47 });
-            BorderLines.Add(new BorderLine { StartX = 277, StartY = 47, EndX = 183, EndY = 82 });
-            BorderLines.Add(new BorderLine { StartX = 183, StartY = 82, EndX = 163, EndY = 4 });
-            BorderLines.Add(new BorderLine { StartX = 163, StartY = 4, EndX = 80, EndY = 25 });
-            BorderLines.Add(new BorderLine { StartX = 80, StartY = 25, EndX = 83, EndY = 136 });
+            BorderLines.Add(new BorderLine (new Models.Point(83, 136), new Models.Point(124, 186)));
+            BorderLines.Add(new BorderLine ( new Models.Point(124, 186), new Models.Point(252, 155)));
+            BorderLines.Add(new BorderLine(new Models.Point(252, 155), new Models.Point(277, 47)));
+            BorderLines.Add(new BorderLine(new Models.Point(277, 47), new Models.Point(183, 82)));
+            BorderLines.Add(new BorderLine(new Models.Point(183, 82), new Models.Point(163, 4)));
+            BorderLines.Add(new BorderLine(new Models.Point(163, 4), new Models.Point(80, 25)));
+            BorderLines.Add(new BorderLine(new Models.Point(80, 25), new Models.Point(83, 136)));
 
             //Coordinates of the restriction zone
-            RestrictionZones.Add(new BorderLine { StartX = 173, StartY = 123, EndX = 182, EndY = 143 });
-            RestrictionZones.Add(new BorderLine { StartX = 182, StartY = 143, EndX = 145, EndY = 147 });
-            RestrictionZones.Add(new BorderLine { StartX = 145, StartY = 147, EndX = 134, EndY = 121 });
-            RestrictionZones.Add(new BorderLine { StartX = 134, StartY = 121, EndX = 173, EndY = 123 });
-        }
-
-        public void CheckIfPointInsidePark(double X, double Y, ObservableCollection<BorderLine> borders)
-        {
-            bool hasTopLine = false;
-            bool hasLeftLine = false;
-            bool hasRightLine = false;
-            bool hasBottomLine = false;
-
-            foreach (var border in borders)
-            {
-                
-            }
-        }
-
-        public void CheckIfSolarPanelFits(SolarPanel solarPanel, ObservableCollection<BorderLine> borders)
-        {
-
+            RestrictionZones.Add(new BorderLine(new Models.Point(173, 123), new Models.Point(182, 143)));
+            RestrictionZones.Add(new BorderLine(new Models.Point(182, 143), new Models.Point(145, 147)));
+            RestrictionZones.Add(new BorderLine(new Models.Point(145, 147), new Models.Point(134, 121)));
+            RestrictionZones.Add(new BorderLine(new Models.Point(134, 121), new Models.Point(173, 123)));
         }
 
         public void CalculateSolarPanels()
         {
-            //the filtration of not fitted solar panels is not calculated yet
-            double StartX = 80;
-            double StartY = 4;
+            Models.Point StartPoint = MinPointOfBorders();
+            Models.Point EndPoint = MaxPointOfBorders();
 
-            double X = StartX;
-            double Y = StartY;
+            double X = StartPoint.X;
+            double Y = StartPoint.Y;
             SolarPanels.Clear();
 
-            for(int i=1; i<10; i++)  //the total number of rows is not calculated yet
+            for (int i = (int)StartPoint.Y; i < EndPoint.Y; i++)
             {
-                for (int y = 0; y< 10; y++)   //the total number of columns is not calculated yet
+                for (int y = (int)StartPoint.X; y < EndPoint.X; y++)
                 {
-                    SolarPanels.Add(new SolarPanel { X = X, Y = Y, Width = Width, Height = Length });
-                    X = X + Length + ColumnSpacing;
+                    var solarPanel = new SolarPanel { X = X, Y = Y, Length = this.Length, Width = this.Width };
+                    if (Width!= 0 && Length!= 0 && CheckIfSolarPanelFits(solarPanel))
+                    {
+                        SolarPanels.Add(solarPanel);
+                        X = X + Length + ColumnSpacing;
+                    }
+                    else
+                        X = X + 1;
                 }
-                X = StartX;
+                X = StartPoint.X;
                 Y = Y + Width + RowSpacing;
             }
-            
+            Overview = "Generated " + SolarPanels.Count + " solar panels";
+        }
+
+        /// <summary>
+        /// Check if the given point is inside of borders area
+        /// </summary>
+        /// <param name="CheckPoint">Paoint to check</param>
+        /// <param name="Borders">Zone borders</param>
+        /// <returns></returns>
+        public static bool CheckIfPointInsideBorders(Models.Point CheckPoint, ObservableCollection<BorderLine> Borders)
+        {
+            int howManyLeft = 0;
+            int howManyRight = 0;
+            int howManyTop = 0;
+            int howManyBottom = 0;
+            foreach (var border in Borders)
+            {
+                //right
+                if (border.doIntersect(new Models.Point(CheckPoint.X, CheckPoint.Y), new Models.Point(CheckPoint.X + 500, CheckPoint.Y)))
+                {
+                    howManyRight++;
+                }
+                //left
+                if(border.doIntersect(new Models.Point(CheckPoint.X, CheckPoint.Y), new Models.Point(CheckPoint.X - 500, CheckPoint.Y)))
+                {
+                    howManyLeft++;
+                }
+                //bottom
+                if (border.doIntersect(new Models.Point(CheckPoint.X, CheckPoint.Y), new Models.Point(CheckPoint.X, CheckPoint.Y+500)))
+                {
+                    howManyBottom++;
+                }
+                //top
+                if (border.doIntersect(new Models.Point(CheckPoint.X, CheckPoint.Y), new Models.Point(CheckPoint.X, CheckPoint.Y - 500)))
+                {
+                    howManyTop++;
+                }
+
+            }
+
+            if (howManyLeft > 0 && howManyRight > 0 && howManyTop > 0 && howManyBottom > 0) 
+                return true;
+            else return false;
+        }
+
+        //lets assume that solar panel can not be bigger than restriction zone so let's check if it fits by checking four corners of the solar panel
+        public bool CheckIfSolarPanelFits(SolarPanel solarPanel)
+        {
+            if ((CheckIfPointInsideBorders(new Models.Point(solarPanel.X, solarPanel.Y), BorderLines) && !CheckIfPointInsideBorders(new Models.Point(solarPanel.X, solarPanel.Y), RestrictionZones)) &&
+               (CheckIfPointInsideBorders(new Models.Point(solarPanel.X + solarPanel.Length, solarPanel.Y), BorderLines) && !CheckIfPointInsideBorders(new Models.Point(solarPanel.X + solarPanel.Length, solarPanel.Y), RestrictionZones)) &&
+               (CheckIfPointInsideBorders(new Models.Point(solarPanel.X, solarPanel.Y + solarPanel.Width), BorderLines) && !CheckIfPointInsideBorders(new Models.Point(solarPanel.X, solarPanel.Y + solarPanel.Width), RestrictionZones)) &&
+               (CheckIfPointInsideBorders(new Models.Point(solarPanel.X + solarPanel.Length, solarPanel.Y + solarPanel.Width), BorderLines) && !CheckIfPointInsideBorders(new Models.Point(solarPanel.X + solarPanel.Length, solarPanel.Y + solarPanel.Width), RestrictionZones)))
+                return true;
+            else return false;
+        }
+
+        private Models.Point MaxPointOfBorders()
+        {
+            Models.Point max = new Models.Point(0, 0);
+            foreach (var border in BorderLines)
+            {
+                if (border.StartPoint.X > max.X)
+                    max.X = border.StartPoint.X;
+                if (border.EndPoint.X > max.X)
+                    max.X = border.EndPoint.X;
+
+                if (border.StartPoint.Y > max.Y)
+                    max.Y = border.StartPoint.Y;
+                if (border.EndPoint.Y > max.Y)
+                    max.Y = border.EndPoint.Y;
+            }
+            return max;
+        }
+
+        private Models.Point MinPointOfBorders()
+        {
+            Models.Point min = new Models.Point(0, 0);
+            foreach (var border in BorderLines)
+            {
+                if (border.StartPoint.X < min.X)
+                    min.X = border.StartPoint.X;
+                if (border.EndPoint.X < min.X)
+                    min.X = border.EndPoint.X;
+
+                if (border.StartPoint.Y < min.Y)
+                    min.Y = border.StartPoint.Y;
+                if (border.EndPoint.Y < min.Y)
+                    min.Y = border.EndPoint.Y;
+            }
+            return min;
         }
     }
 }

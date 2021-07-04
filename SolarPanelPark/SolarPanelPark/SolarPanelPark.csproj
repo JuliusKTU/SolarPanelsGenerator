@@ -63,6 +63,7 @@
     <Compile Include="Controls\INavigator.cs" />
     <Compile Include="Controls\Navigator.cs" />
     <Compile Include="Models\BorderLine.cs" />
+    <Compile Include="Models\Point.cs" />
     <Compile Include="Models\SolarPanel.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="ViewModels\HomePageViewModel.cs" />

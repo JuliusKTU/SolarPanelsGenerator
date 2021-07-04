@@ -17,16 +17,16 @@
                 <StackPanel>
                     <TextBlock Text="Width"/>
                     <TextBox Name="WidthTextBox" Text="{Binding Width}"/>
-                    
+
                     <TextBlock Text="Length"/>
                     <TextBox Name="LengthTextBox" Text="{Binding Length}"/>
-                    
+
                     <TextBlock Text="Row spacing"/>
                     <TextBox Name="RowSpacingTextBox" Text="{Binding RowSpacing}"/>
-                    
+
                     <TextBlock Text="Column spacing"/>
                     <TextBox Name="ColumnSpacingTextBox" Text="{Binding ColumnSpacing}"/>
-                    
+
                     <TextBlock Text="Tilt angle"/>
                     <TextBox Name="TiltAngleTextBox" Text="{Binding TiltAngle}"/>
                 </StackPanel>
@@ -34,7 +34,8 @@
         </StackPanel>
 
         <StackPanel Grid.Column="1" Margin="15" HorizontalAlignment="Left">
-           
+            <TextBlock Text="{Binding Overview}" Margin="0 0 0 15"/>
+
             <!--Drawing a border-->
             <ItemsControl ItemsSource="{Binding BorderLines}">
                 <ItemsControl.ItemsPanel>
@@ -44,11 +45,11 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Line X1="{Binding StartX}" Y1="{Binding StartY}" X2="{Binding EndX}" Y2="{Binding EndY}" Stroke="Black" />
+                        <Line X1="{Binding StartPoint.X}" Y1="{Binding StartPoint.Y}" X2="{Binding EndPoint.X}" Y2="{Binding EndPoint.Y}" Stroke="Black" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-            
+
             <!--Drawing a restriction zones-->
             <ItemsControl ItemsSource="{Binding RestrictionZones}">
                 <ItemsControl.ItemsPanel>
@@ -58,7 +59,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Line X1="{Binding StartX}" Y1="{Binding StartY}" X2="{Binding EndX}" Y2="{Binding EndY}" Stroke="DarkRed" />
+                        <Line X1="{Binding StartPoint.X}" Y1="{Binding StartPoint.Y}" X2="{Binding EndPoint.X}" Y2="{Binding EndPoint.Y}" Stroke="DarkRed" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
@@ -78,14 +79,11 @@
                 </ItemsControl.ItemContainerStyle>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Rectangle Width="{Binding Width}" Height="{Binding Height}" Stroke="Black"/>
+                        <Rectangle Width="{Binding Length}" Height="{Binding Width}" Fill="Yellow" Stroke="Black"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-
-
-
         </StackPanel>
-        
+
     </Grid>
 </UserControl>
