@@ -13,6 +13,9 @@ namespace SolarPanelPark.ViewModels
     public class SolarParkViewModel : BaseViewModel
     {
         #region DEFINITIONS
+
+        const int MAXSIZEOFAREA = 1000;
+
         private string _overview;
         public string Overview
         {
@@ -171,22 +174,22 @@ namespace SolarPanelPark.ViewModels
             foreach (var border in Borders)
             {
                 //right
-                if (border.doIntersect(new Models.Point(CheckPoint.X, CheckPoint.Y), new Models.Point(CheckPoint.X + 500, CheckPoint.Y)))
+                if (border.doIntersect(new Models.Point(CheckPoint.X, CheckPoint.Y), new Models.Point(CheckPoint.X + MAXSIZEOFAREA, CheckPoint.Y)))
                 {
                     howManyRight++;
                 }
                 //left
-                if(border.doIntersect(new Models.Point(CheckPoint.X, CheckPoint.Y), new Models.Point(CheckPoint.X - 500, CheckPoint.Y)))
+                if(border.doIntersect(new Models.Point(CheckPoint.X, CheckPoint.Y), new Models.Point(CheckPoint.X - MAXSIZEOFAREA, CheckPoint.Y)))
                 {
                     howManyLeft++;
                 }
                 //bottom
-                if (border.doIntersect(new Models.Point(CheckPoint.X, CheckPoint.Y), new Models.Point(CheckPoint.X, CheckPoint.Y+500)))
+                if (border.doIntersect(new Models.Point(CheckPoint.X, CheckPoint.Y), new Models.Point(CheckPoint.X, CheckPoint.Y + MAXSIZEOFAREA)))
                 {
                     howManyBottom++;
                 }
                 //top
-                if (border.doIntersect(new Models.Point(CheckPoint.X, CheckPoint.Y), new Models.Point(CheckPoint.X, CheckPoint.Y - 500)))
+                if (border.doIntersect(new Models.Point(CheckPoint.X, CheckPoint.Y), new Models.Point(CheckPoint.X, CheckPoint.Y - MAXSIZEOFAREA)))
                 {
                     howManyTop++;
                 }
